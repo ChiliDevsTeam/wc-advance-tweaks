@@ -1,0 +1,33 @@
+{
+    "name": "chilidevs/wc-advance-tweaks",
+    "description": "This is a plugin to tweak WooCommerce settings",
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.5",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "wp-coding-standards/wpcs": "^2.3",
+        "sirbrillig/phpcs-variable-analysis": "^2.10",
+        "automattic/vipwpcs": "^2.2",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "phpunit/phpunit": "8.5",
+        "10up/wp_mock": "0.4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ChiliDevs\\WCAdvanceTweaks\\": "includes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ChiliDevs\\WCAdvanceTweaks\\Tests\\": "tests/php"
+        }
+    },
+    "scripts": {
+        "cs": "@php ./vendor/bin/phpcs . --ignore=tests",
+        "cs:fix": "@php ./vendor/bin/phpcbf plugins.php src/",
+        "tests:unit": "@php ./vendor/bin/phpunit tests/php/Unit/",
+        "qa": [
+            "@cs",
+            "@tests"
+        ]
+    }
+}
