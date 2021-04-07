@@ -26,9 +26,13 @@ class Frontend {
 	public function __construct() {
 		add_filter( 'woocommerce_product_single_add_to_cart_text', [ $this, 'change_add_to_cart_single' ] );
 		add_filter( 'woocommerce_product_add_to_cart_text', [ $this, 'change_add_to_cart_shop' ] );
+		add_filter( 'gettext', [ $this, 'change_update_cart_text' ], 20, 3 );
 		add_action( 'woocommerce_cart_coupon', [ $this, 'custom_woocommerce_empty_cart_button' ] );
 		add_action( 'init', [ $this, 'custom_woocommerce_empty_cart_action' ] );
+		//add_filter( 'woocommerce_is_sold_individually', [ $this, 'wc_remove_quantity_field_from_cart' ], 10, 2 );
 		add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'wc_get_cart_url' ], 99 );
+		add_filter('woocommerce_cart_item_quantity', [ $this, 'wc_hide_quantity' ], 12, 3 );
+
 	}
 
 	/**
@@ -41,7 +45,7 @@ class Frontend {
 
 	/**
 	* update add to cart button for shop page
-	*/
+	 */
 	public function change_add_to_cart_shop() {
 		global $product;
 		$add_to_cart= get_option( 'wc_advance_tweaks_add_to_cart_button' );
@@ -53,6 +57,16 @@ class Frontend {
 			default:
 				return __( $add_to_cart, 'woocommerce' );
 		}
+	}
+
+	/**
+	 * update cart on cart button change text
+	 */
+	public function change_update_cart_text( $translated, $text, $domain ) {
+		if( is_cart() && $translated == 'Update cart' ){
+			$translated = get_option( 'wc_advance_tweaks_update_cart_button' );
+		}
+		return $translated;
 	}
 
 	/**
@@ -76,13 +90,23 @@ class Frontend {
 		}
 	}
 
+	/**
+	 * add to cart redirect function
+	 */
 	public function wc_get_cart_url( $url ) {
 		return get_permalink(get_option( 'wc_advance_tweaks_redirect_button') );
+	}
 
-		//$page_id =
-		//var_dump(get_option( 'wc_advance_tweaks_redirect_button' ));
-		//var_dump(get_permalink(get_option( 'wc_advance_tweaks_redirect_button') ));
-		//return $page_url;
-		//var_dump($page_url);
+	/**
+	 * remove quantity option while checked
+	 */
+	public function wc_remove_quantity_field_from_cart( $return, $product ) {
+		if ( is_cart() ) {
+			return true;
+		}
+	}
+
+	public function wc_hide_quantity( $product_quantity, $cart_item_key, $cart_item ) {
+		return $cart_item['quantity'];
 	}
 }

@@ -82,14 +82,18 @@ class Admin {
 				'desc' => __( 'This will replace woocommerce variation button text value ', 'wc-advance-tweaks' ),
 				'id'   => 'wc_advance_tweaks_variation_button'
 			),
+			'update-cart-button-text' => array(
+				'name' => __( 'Update cart button text', 'wc-advance-tweaks' ),
+				'type' => 'textarea',
+				'desc' => __( 'This will replace woocommerce update cart button in cart page text value', 'wc-advance-tweaks' ),
+				'id'   => 'wc_advance_tweaks_update_cart_button'
+			),
 			'redirect-to' => array(
-				'name' => __( 'Select Pages', 'wc-advance-tweaks' ),
-				'type' => 'select',
-				'desc' => __( 'Select preffered pages to show ', 'wc-advance-tweaks' ),
-				'id'   => 'wc_advance_tweaks_redirect_button',
+				'name'    => __( 'Redirect on clicking add to cart', 'wc-advance-tweaks' ),
+				'type'    => 'select',
+				'desc'    => __( 'Select preffered page to redirect while customer click add to cart button', 'wc-advance-tweaks' ),
+				'id'      => 'wc_advance_tweaks_redirect_button',
 				'options' => $this->get_pages(),
-
-
 			),
 			'empty-cart-button-check' => array(
 				'name' => __( 'Empty Cart Button', 'wc-advance-tweaks' ),
@@ -98,8 +102,8 @@ class Admin {
 				'id'   => 'wc_advance_tweaks_empty_button_checkbox'
 			),
 			'section_end' => array(
-				 'type' => 'sectionend',
-				 'id' => 'wc-advance-tweaks_section_end'
+				'type'    => 'sectionend',
+				'id'      => 'wc-advance-tweaks_section_end'
 			)
 		);
 		return apply_filters( 'wc_settings_tab_demo_setting', $settings );
