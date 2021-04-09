@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace ChiliDevs\WCAdvanceTweaks\Admin;
 
+use WC_Coupon;
+
 /**
  * Admin class.
  *
@@ -48,6 +50,9 @@ class Admin {
 		woocommerce_admin_fields( $this-> get_settings() );
 	}
 
+	/**
+	 * get all the page title
+	 */
 	public function get_pages() {
         $pages = get_pages();
         $pages_options = array();
@@ -58,6 +63,26 @@ class Admin {
         }
         return $pages_options;
     }
+
+	/**
+	 * get all the coupon title
+	 */
+	public function get_coupon() {
+		$args = array(
+			'posts_per_page'   => -1,
+			'orderby'          => 'title',
+			'order'            => 'asc',
+			'post_type'        => 'shop_coupon',
+			'post_status'      => 'publish',
+		);
+		$coupons = get_posts( $args );
+		$coupon_names = array();
+		foreach ( $coupons as $coupon ) {
+			$coupon = new WC_Coupon( $coupon->ID );
+			$coupon_name[$coupon->get_id()] = $coupon->get_code();
+		}
+		return $coupon_name;
+	}
 
 	/**
 	 * Add custom fields
@@ -100,6 +125,20 @@ class Admin {
 				'type' => 'checkbox',
 				'desc' => __( 'Check this box to show empty cart button', 'wc-advance-tweaks' ),
 				'id'   => 'wc_advance_tweaks_empty_button_checkbox'
+			),
+			'hide-quantity-in-cart-check' => array(
+				'name' => __( 'Hide quantity field in cart', 'wc-advance-tweaks' ),
+				'type' => 'checkbox',
+				'desc' => __( 'Check this box to disallow changing quantity in cart page', 'wc-advance-tweaks' ),
+				'id'   => 'wc_advance_tweaks_hide_quantity_checkbox'
+			),
+			'coupon-show' => array(
+				'name'    => __( 'Choose coupons to offer', 'wc-advance-tweaks' ),
+				'type'    => 'multiselect',
+				'desc'    => __( 'Select the coupons for customers to show', 'wc-advance-tweaks' ),
+				'class'   => 'wc-enhanced-select',
+				'id'      => 'wc_advance_tweaks_coupon_select_field',
+				'options' => $this->get_coupon(),
 			),
 			'section_end' => array(
 				'type'    => 'sectionend',

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace ChiliDevs\WCAdvanceTweaks\Frontend;
 
+use WC_Coupon;
+
 /**
  * Frontend class.
  *
@@ -29,9 +31,9 @@ class Frontend {
 		add_filter( 'gettext', [ $this, 'change_update_cart_text' ], 20, 3 );
 		add_action( 'woocommerce_cart_coupon', [ $this, 'custom_woocommerce_empty_cart_button' ] );
 		add_action( 'init', [ $this, 'custom_woocommerce_empty_cart_action' ] );
-		//add_filter( 'woocommerce_is_sold_individually', [ $this, 'wc_remove_quantity_field_from_cart' ], 10, 2 );
 		add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'wc_get_cart_url' ], 99 );
-		add_filter('woocommerce_cart_item_quantity', [ $this, 'wc_hide_quantity' ], 12, 3 );
+		add_filter( 'woocommerce_cart_item_quantity', [ $this, 'wc_hide_quantity' ], 12, 3 );
+		add_action( 'woocommerce_cart_collaterals', [ $this, 'woocommerce_coupon_show_field' ] );
 
 	}
 
@@ -100,13 +102,30 @@ class Frontend {
 	/**
 	 * remove quantity option while checked
 	 */
-	public function wc_remove_quantity_field_from_cart( $return, $product ) {
-		if ( is_cart() ) {
-			return true;
+	 public function wc_hide_quantity( $product_quantity, $cart_item_key, $cart_item ) {
+		$hide = get_option( 'wc_advance_tweaks_hide_quantity_checkbox' );
+		if ( $hide === 'yes' ) {
+			return $cart_item['quantity'];
 		}
+		return $product_quantity;
 	}
 
-	public function wc_hide_quantity( $product_quantity, $cart_item_key, $cart_item ) {
-		return $cart_item['quantity'];
+	/**
+	 * dislay available coupon detail on cart page
+	 */
+	public function woocommerce_coupon_show_field() {
+		$coupons = get_option( 'wc_advance_tweaks_coupon_select_field' );
+		echo '<div class="wc-available-coupons">';
+		echo "<b>" . 'You can use the following discount codes on your cart' . "</b>";
+        foreach ( $coupons as $coupon ) {
+            $coupon = new WC_Coupon( $coupon );
+			?>
+				<div classe="copon-box">
+					<br><p><?php echo 'Code: ' . "<b>" . $coupon->get_code() . "</b>"; ?></p>
+					<p><?php echo 'Amount: ' . $coupon->get_amount(); ?></p>
+					<p><?php echo $coupon->get_description(); ?></p>
+				</div>
+			<?php
+		}
 	}
 }
