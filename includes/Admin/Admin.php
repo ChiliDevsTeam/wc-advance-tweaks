@@ -29,6 +29,8 @@ class Admin {
 		add_filter( 'woocommerce_settings_tabs_array', [ $this, 'add_tweak_tab' ], 50 );
 		add_action( 'woocommerce_settings_tabs_tweak_tab', [ $this, 'add_settings_tab' ] );
 		add_action( 'woocommerce_update_options_tweak_tab', [ $this, 'update_tweak_settings' ] );
+		add_filter( 'woocommerce_get_sections_products' , [ $this, 'add_custom_sub_menu' ] );
+		add_filter( 'woocommerce_get_settings_products' , [ $this, 'my_account_submenu_hide' ], 10, 2 );
 	}
 
 	/**
@@ -47,7 +49,7 @@ class Admin {
 	 * Add fields on custum tab
 	*/
 	public function add_settings_tab() {
-		woocommerce_admin_fields( $this-> get_settings() );
+		woocommerce_admin_fields( $this->get_settings() );
 	}
 
 	/**
@@ -93,7 +95,7 @@ class Admin {
 				'name'     => __( 'Advanced Tweaks', 'wc-advance-tweaks' ),
 				'type'     => 'title',
 				'desc'     => '',
-				'id'       => 'wc-advance-tweaks_section_title'
+				'id'       => 'wc_advance_tweaks_section_title'
 			),
 			'add-to-cart-button-text' => array(
 				'name' => __( 'Add to cart button text', 'wc-advance-tweaks' ),
@@ -153,5 +155,45 @@ class Admin {
 	 */
 	public function update_tweak_settings () {
 		woocommerce_update_options( $this->get_settings() );
+	}
+
+	/**
+	 * add new submenu
+	 */
+	public function add_custom_sub_menu ( $settings_tab ) {
+		$settings_tab['new_submenu'] = __( 'MiscTweaks', 'wc-advance-tweaks');
+     	return $settings_tab;
+	}
+
+	/**
+	 * add settings to submenu
+	 */
+	public function my_account_submenu_hide( $settings, $current_section ) {
+		$custom_settings = array();
+		if( 'new_submenu' == $current_section ) {
+			 $custom_settings =  array(
+				'section_title' => array(
+					'name'     => __( 'MiscTweaks', 'wc-advance-tweaks' ),
+					'type'     => 'title',
+					'desc'     => '',
+					'id'       => 'wc_advance_tweaks_my_account_menu'
+				),
+				'my-account-show-menu' => array(
+					'name'    => __( 'Choose menu to hide', 'wc-advance-tweaks' ),
+					'type'    => 'multiselect',
+					'desc'    => __( 'Select the menus for customers to hide', 'wc-advance-tweaks' ),
+					'class'   => 'wc-enhanced-select',
+					'id'      => 'wc_advance_tweaks_coupon_select_field',
+					'options' => wc_get_account_menu_items(),
+				),
+				'section_end' => array(
+					'type'    => 'sectionend',
+					'id'      => 'wc-advance-tweaks_section_endd'
+				)
+	   		);
+		  		return $custom_settings;
+	  		} else {
+		   		return $settings;
+	  }
 	}
 }

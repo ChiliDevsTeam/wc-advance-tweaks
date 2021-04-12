@@ -34,6 +34,7 @@ class Frontend {
 		add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'wc_get_cart_url' ], 99 );
 		add_filter( 'woocommerce_cart_item_quantity', [ $this, 'wc_hide_quantity' ], 12, 3 );
 		add_action( 'woocommerce_cart_collaterals', [ $this, 'woocommerce_coupon_show_field' ] );
+		add_action( 'woocommerce_account_menu_items', [ $this, 'woocommerce_my_account_menu' ], 10, 2 );
 
 	}
 
@@ -127,5 +128,16 @@ class Frontend {
 				</div>
 			<?php
 		}
+	}
+
+	/**
+	 *hide menu from my-account for customer
+	 */
+	public function woocommerce_my_account_menu( $menu_links ) {
+		$menus = get_option('wc_advance_tweaks_coupon_select_field');
+		foreach( $menus as $menu ) {
+			unset( $menu_links[$menu] );
+		}
+		return $menu_links;
 	}
 }
