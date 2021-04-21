@@ -34,8 +34,11 @@ class Frontend {
 		add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'wc_get_cart_url' ], 99 );
 		add_filter( 'woocommerce_cart_item_quantity', [ $this, 'wc_hide_quantity' ], 12, 3 );
 		add_action( 'woocommerce_cart_collaterals', [ $this, 'woocommerce_coupon_show_field' ] );
-		add_action( 'woocommerce_account_menu_items', [ $this, 'woocommerce_my_account_menu' ], 10, 2 );
-
+		add_action( 'woocommerce_checkout_before_customer_details', [ $this, 'wc_coupon_show_checkout_checkbox' ] );
+		add_action( 'woocommerce_account_menu_items', [ $this, 'woocommerce_hide_my_account_menu' ], 10, 2 );
+		add_filter( 'woocommerce_account_menu_items', [ $this, 'rename_my_account' ] , 9999 );
+		add_filter( 'woocommerce_endpoint_order-received_title', [ $this, 'thank_you_title_edited' ] );
+		add_filter( 'woocommerce_thankyou_order_received_text', [ $this,'thank_you_text_edited' ], 20, 2 );
 	}
 
 	/**
@@ -117,27 +120,86 @@ class Frontend {
 	public function woocommerce_coupon_show_field() {
 		$coupons = get_option( 'wc_advance_tweaks_coupon_select_field' );
 		echo '<div class="wc-available-coupons">';
-		echo "<b>" . 'You can use the following discount codes on your cart' . "</b>";
-        foreach ( $coupons as $coupon ) {
+		echo "<p><strong>" . 'You can use the following discount codes on your cart' . "</strong><p>";
+        ?>
+			<div class="flex-container" style="display:flex";>
+		<?php
+		foreach ( $coupons as $coupon ) {
             $coupon = new WC_Coupon( $coupon );
 			?>
-				<div classe="copon-box">
-					<br><p><?php echo 'Code: ' . "<b>" . $coupon->get_code() . "</b>"; ?></p>
+				<div class="copon-box" style="background-color:#85C1E9; display:inline-block; width:350px; margin-right:20px; padding:10px; border-radius:5px">
+					<p><?php echo 'Coupon: ' . '<strong style="color:white; background-color:orange;padding:5px; border-radius:20%">' . $coupon->get_code() . '</strong>'; ?></p>
 					<p><?php echo 'Amount: ' . $coupon->get_amount(); ?></p>
 					<p><?php echo $coupon->get_description(); ?></p>
 				</div>
+				</br>
 			<?php
+		}
+		?>
+			</div>
+		<?php
+	}
+
+	/**
+	 * checkbox for woocommerce checkout page to show coupon
+	 */
+	public function wc_coupon_show_checkout_checkbox() {
+		$showcouponcheckout = get_option('wc_advance_tweaks_coupon_checkoutpage_checkbox');
+		if ( $showcouponcheckout == 'yes' ) {
+			$this->woocommerce_coupon_show_field();
 		}
 	}
 
 	/**
 	 *hide menu from my-account for customer
 	 */
-	public function woocommerce_my_account_menu( $menu_links ) {
+	public function woocommerce_hide_my_account_menu( $menu_links ) {
 		$menus = get_option('wc_advance_tweaks_coupon_select_field');
 		foreach( $menus as $menu ) {
 			unset( $menu_links[$menu] );
 		}
 		return $menu_links;
 	}
+
+	/**
+	 *
+	 */
+	public function rename_my_account( $items ) {
+		$dashboard_rename      = get_option( 'wc_advance_tweaks_dashboard_rename', 'dashboard' );
+		$orders_rename         = get_option( 'wc_advance_tweaks_orders_rename' );
+		$downloads_rename      = get_option( 'wc_advance_tweaks_downloads_rename' );
+		$editaddress_rename    = get_option( 'wc_advance_tweaks_addresses_rename' );
+		$paymentmethods_rename = get_option( 'wc_advance_tweaks_paymentmethods_rename' );
+		$editaccount_rename    = get_option( 'wc_advance_tweaks_accountdetails_rename' );
+		$logout_rename         = get_option('wc_advance_tweaks_logout_rename');
+
+		$items['dashboard']       = ! empty( $dashboard_rename ) ? $dashboard_rename : __( 'Dashboard', 'wc-advance-tweaks' );
+		$items['orders']          = ! empty( $orders_rename ) ? $orders_rename : __( 'Orders', 'wc-advance-tweaks' );
+		$items['downloads']       = ! empty( $downloads_rename ) ? $downloads_rename : __( 'Downloads', 'wc-advance-tweaks' );
+		$items['edit-address']    = ! empty( $editaddress_rename ) ? $editaddress_rename : __( 'Addresses', 'wc-advance-tweaks' );
+		$items['payment-method']  = ! empty( $paymentmethods_rename ) ? $paymentmethods_rename : __( 'Payment methods', 'wc-advance-tweaks' );
+		$items['edit-account']    = ! empty( $editaccount_rename ) ? $editaccount_rename : __( 'Account details', 'wc-advance-tweaks' );
+		$items['customer-logout'] = ! empty( $logout_rename ) ? $logout_rename : __( 'Logout', 'wc-advance-tweaks' );
+
+   		return $items;
+	}
+
+	/**
+	 * thank you title changed text
+	 */
+	public function thank_you_title_edited( $old_title ) {
+		$thankyou_title = get_option('wc_advance_tweaks_update_thank_you_title');
+		return ! empty( $thankyou_title ) ? $thankyou_title : __( 'Order Received', 'wc-advance-tweaks' );
+	}
+
+	/**
+	 * thank you page changed text
+	 */
+	public function thank_you_text_edited( $thank_you_title, $order ){
+		$thankyou_text = get_option('wc_advance_tweaks_update_thank_you_text');
+		return ! empty( $thankyou_text ) ? $thankyou_text : __( 'Thank You. Your order has been received.', 'wc-advance-tweaks' );
+
+	}
+
+
 }

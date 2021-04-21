@@ -31,6 +31,7 @@ class Admin {
 		add_action( 'woocommerce_update_options_tweak_tab', [ $this, 'update_tweak_settings' ] );
 		add_filter( 'woocommerce_get_sections_products' , [ $this, 'add_custom_sub_menu' ] );
 		add_filter( 'woocommerce_get_settings_products' , [ $this, 'my_account_submenu_hide' ], 10, 2 );
+		add_filter( 'woocommerce_get_settings_products' , [ $this, 'rename_my_account_menutab' ], 10, 2 );
 	}
 
 	/**
@@ -142,6 +143,24 @@ class Admin {
 				'id'      => 'wc_advance_tweaks_coupon_select_field',
 				'options' => $this->get_coupon(),
 			),
+			'show-coupon-checkoutpage-check' => array(
+				'name' => __( 'Show coupon in checkout page', 'wc-advance-tweaks' ),
+				'type' => 'checkbox',
+				'desc' => __( 'Check this box to allow customers see the coupons in checkout page', 'wc-advance-tweaks' ),
+				'id'   => 'wc_advance_tweaks_coupon_checkoutpage_checkbox'
+			),
+			'update-thank-you-title' => array(
+				'name' => __( 'Thank You title', 'wc-advance-tweaks' ),
+				'type' => 'textarea',
+				'desc' => __( 'This will replace woocommerce thank you page title', 'wc-advance-tweaks' ),
+				'id'   => 'wc_advance_tweaks_update_thank_you_title'
+			),
+			'update-thank-you-text' => array(
+				'name' => __( 'Thank You text', 'wc-advance-tweaks' ),
+				'type' => 'textarea',
+				'desc' => __( 'This will replace woocommerce thank you page text', 'wc-advance-tweaks' ),
+				'id'   => 'wc_advance_tweaks_update_thank_you_text'
+			),
 			'section_end' => array(
 				'type'    => 'sectionend',
 				'id'      => 'wc-advance-tweaks_section_end'
@@ -162,6 +181,7 @@ class Admin {
 	 */
 	public function add_custom_sub_menu ( $settings_tab ) {
 		$settings_tab['new_submenu'] = __( 'MiscTweaks', 'wc-advance-tweaks');
+		$settings_tab['rename_myaccount_menu'] = __( 'MyAccountMenu', 'wc-advance-tweaks');
      	return $settings_tab;
 	}
 
@@ -170,7 +190,7 @@ class Admin {
 	 */
 	public function my_account_submenu_hide( $settings, $current_section ) {
 		$custom_settings = array();
-		if( 'new_submenu' == $current_section ) {
+		if ( 'new_submenu' == $current_section ) {
 			 $custom_settings =  array(
 				'section_title' => array(
 					'name'     => __( 'MiscTweaks', 'wc-advance-tweaks' ),
@@ -192,8 +212,76 @@ class Admin {
 				)
 	   		);
 		  		return $custom_settings;
-	  		} else {
+	  	} else {
 		   		return $settings;
-	  }
+	  		}
+	}
+
+	/**
+	 * renamee woocommerce customer my account menu
+	 */
+	public function rename_my_account_menutab( $settings, $current_section ) {
+		$custom_settings = array();
+		if ( 'rename_myaccount_menu' == $current_section ) {
+			 $custom_settings =  array(
+				'section_title' => array(
+					'name'     => __( 'My-account menu rename', 'wc-advance-tweaks' ),
+					'type'     => 'title',
+					'desc'     => '',
+					'id'       => 'wc_advance_tweaks_my_account_menu_rename'
+				),
+				'my-account-menutab-dashboard-rename' => array(
+					'name' => __( 'Dashboard', 'wc-advance-tweaks' ),
+					'type' => 'text',
+					'desc' => __( 'This will rename dashboard menu tab name in my account', 'wc-advance-tweaks' ),
+					'id'   => 'wc_advance_tweaks_dashboard_rename'
+				),
+				'my-account-menutab-orders-rename' => array(
+					'name' => __( 'Orders', 'wc-advance-tweaks' ),
+					'type' => 'text',
+					'desc' => __( 'This will rename orders menu tab name in my account', 'wc-advance-tweaks' ),
+					'id'   => 'wc_advance_tweaks_orders_rename'
+				),
+				'my-account-menutab-downloads-rename' => array(
+					'name' => __( 'Downloads', 'wc-advance-tweaks' ),
+					'type' => 'text',
+					'desc' => __( 'This will rename dashboard menu tab name in my account', 'wc-advance-tweaks' ),
+					'id'   => 'wc_advance_tweaks_downloads_rename'
+				),
+				'my-account-menutab-addresses-rename' => array(
+					'name' => __( 'Addresses', 'wc-advance-tweaks' ),
+					'type' => 'text',
+					'desc' => __( 'This will rename dashboard menu tab name in my account', 'wc-advance-tweaks' ),
+					'id'   => 'wc_advance_tweaks_addresses_rename'
+				),
+				'my-account-menutab-paymentmethods-rename' => array(
+					'name' => __( 'Payment Methods', 'wc-advance-tweaks' ),
+					'type' => 'text',
+					'desc' => __( 'This will rename dashboard menu tab name in my account', 'wc-advance-tweaks' ),
+					'id'   => 'wc_advance_tweaks_paymentmethods_rename',
+				),
+				'my-account-menutab-accountdetails-rename' => array(
+					'name' => __( 'Account details', 'wc-advance-tweaks' ),
+					'type' => 'text',
+					'desc' => __( 'This will rename dashboard menu tab name in my account', 'wc-advance-tweaks' ),
+					'id'   => 'wc_advance_tweaks_accountdetails_rename'
+
+				),
+				'my-account-menutab-logout-rename' => array(
+					'name' => __( 'Logout', 'wc-advance-tweaks' ),
+					'type' => 'text',
+					'desc' => __( 'This will rename dashboard menu tab name in my account', 'wc-advance-tweaks' ),
+					'id'   => 'wc_advance_tweaks_logout_rename'
+				),
+
+				'section_end' => array(
+					'type'    => 'sectionend',
+					'id'      => 'wc-advance-tweaks_section_end'
+				)
+	   		);
+		  		return $custom_settings;
+	  	} else {
+		   		return $settings;
+	  		}
 	}
 }
